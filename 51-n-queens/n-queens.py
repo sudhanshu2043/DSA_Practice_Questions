@@ -1,48 +1,24 @@
 class Solution:
-    def isSafe(self,row,col,board,n):
-        #check upper element
-        duprow = row
-        dupcol = col
-
-
-        while row >= 0 and col >= 0:
-            if board[row][col] == 'Q':
-                return False
-            row -= 1
-            col -= 1
-
-
-        col = dupcol
-        row = duprow
-        while col >= 0:
-            if board[row][col] == 'Q':
-                return False
-            col -= 1
-
-
-        row = duprow
-        col = dupcol
-        while row < n and col >= 0:
-            if board[row][col] == 'Q':
-                return False
-            row += 1
-            col -= 1
-
-
-        return True
-    def generate(self,col,board,ans,n):
-        if col == n:
-            ans.append(list(board))
+    def generate(self,col,board,ans,leftrow,upperDiagonal,lowerDiagonal,n):
+        if col==n:
+            ans.append(board[:])
             return
-
-
         for row in range(n):
-            if self.isSafe(row, col, board, n):
-                board[row] = board[row][:col] + 'Q' + board[row][col+1:]
-                self.generate(col+1, board, ans, n)
-                board[row] = board[row][:col] + '.' + board[row][col+1:]
+            if leftrow[row]==0 and lowerDiagonal[row+col]==0 and upperDiagonal[n-1+col-row]==0:
+                board[row]=board[row][:col]+'Q'+board[row][col+1:]
+                leftrow[row]=1
+                lowerDiagonal[row+col]=1
+                upperDiagonal[n-1+col-row]=1
+                self.generate(col+1,board,ans,leftrow,upperDiagonal,lowerDiagonal,n)
+                board[row]=board[row][:col]+'.'+board[row][col+1:]
+                leftrow[row]=0
+                lowerDiagonal[row+col]=0
+                upperDiagonal[n-1+col-row]=0
     def solveNQueens(self, n: int) -> List[List[str]]:
-        ans = []
-        board = ['.'*n for _ in range(n)]
-        self.generate(0, board, ans, n)
+        ans=[]
+        board=['.'*n for _ in range(n)]
+        leftrow=[0]*n
+        upperDiagonal=[0]*(2*n-1)
+        lowerDiagonal=[0]*(2*n-1)
+        self.generate(0,board,ans,leftrow,upperDiagonal,lowerDiagonal,n)
         return ans
