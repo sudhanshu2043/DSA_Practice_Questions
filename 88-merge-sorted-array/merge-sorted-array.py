@@ -3,12 +3,7 @@ class Solution:
         """
         Do not return anything, modify nums1 in-place instead.
         """
-        temp=[]
-        for i in range(m):
-            temp.append(nums1[i])
-        for j in range(n):
-            temp.append(nums2[j])
-        temp.sort()
-        for i in range(m+n):
-            nums1[i]=temp[i]
+        for i in range(n):
+            nums1[m+i]=nums2[i]
+        nums1.sort()
         
