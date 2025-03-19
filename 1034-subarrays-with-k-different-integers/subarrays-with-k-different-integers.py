@@ -1,13 +1,14 @@
+from collections import defaultdict
 class Solution:
-    def solve(self,nums,k):
+    def atmost(self,nums,k):
         l,r=0,0
         cnt=0
-        mpp={}
-        while r < len(nums):
-            if nums[r] in mpp:
-                mpp[nums[r]]+=1
-            else:
+        mpp=defaultdict()
+        for r in range(len(nums)):
+            if nums[r] not in mpp:
                 mpp[nums[r]]=1
+            else:
+                mpp[nums[r]]+=1
             while len(mpp)>k:
                 mpp[nums[l]]-=1
                 if mpp[nums[l]]==0:
@@ -17,5 +18,5 @@ class Solution:
             r+=1
         return cnt
     def subarraysWithKDistinct(self, nums: List[int], k: int) -> int:
-        return self.solve(nums,k)-self.solve(nums,k-1)
+        return self.atmost(nums,k)-self.atmost(nums,k-1)
         
