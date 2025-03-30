@@ -1,31 +1,31 @@
 class Solution:
-    def firstPosition(self,nums,target):
-        ans=-1
-        start,end=0,len(nums)-1
-        while start<=end:
-            mid=(start+end)//2
+    def firstPos(self,nums,target):
+        low,high=0,len(nums)-1
+        first=-1
+        while low<=high:
+            mid=low+(high-low)//2
             if nums[mid]==target:
-                ans=mid
-                end=mid-1
+                first=mid
+                high=mid-1
             elif nums[mid]>target:
-                end=mid-1
+                high=mid-1
             else:
-                start=mid+1
-        return ans
-    def lastPosition(self,nums,target):
-        ans=-1
-        start,end=0,len(nums)-1
-        while start<=end:
-            mid=(start+end)//2
+                low=mid+1
+        return first
+    def LastPos(self,nums,target):
+        low,high=0,len(nums)-1
+        last=-1
+        while low<=high:
+            mid=low+(high-low)//2
             if nums[mid]==target:
-                ans=mid
-                start=mid+1
+                last=mid
+                low=mid+1
             elif nums[mid]>target:
-                end=mid-1
+                high=mid-1
             else:
-                start=mid+1
-        return ans
+                low=mid+1
+        return last
     def searchRange(self, nums: List[int], target: int) -> List[int]:
-        first=self.firstPosition(nums,target)
-        last=self.lastPosition(nums,target)
+        first=self.firstPos(nums,target)
+        last=self.LastPos(nums,target)
         return [first,last]
