@@ -1,30 +1,27 @@
 from typing import List
 
 class Solution:
-    def func(self, prices, dp):
-        n = len(prices)
-        curr = [[0] * 3 for _ in range(2)]
-        # Loop backwards from day n-1 down to 0
-        for ind in range(n - 1, -1, -1):
-            for buy in range(2):
-                # FIX 1: Start from 1 to avoid cap-1 becoming -1
-                for cap in range(1, 3): 
-                    if buy:
-                        curr[buy][cap] = max(-prices[ind] + dp[0][cap], 
-                                                 dp[1][cap])
-                    else:
-                        curr[buy][cap] = max(prices[ind] + dp[1][cap - 1], 
-                                                 dp[0][cap])
-            dp=curr                   
-        # FIX 3: Return the specific starting state: Day 0, Can Buy, 2 Transactions left
-        return dp[1][2]
-
     def maxProfit(self, prices: List[int]) -> int:
-        n = len(prices)
+        # dp[0]: First Buy, dp[1]: First Sell, dp[2]: Second Buy, dp[3]: Second Sell
+        # Base Case: Out of bounds day (day n) yields 0 profit across all states
+        dp = [0] * 4
         
-        # FIX 2: Initialize with 0 instead of -1. 
-        # This automatically sets up the base cases for ind == n and cap == 0.
-        dp = [[0] * 3 for _ in range(2)]
-        
-        # No need to pass starting values as parameters anymore
-        return self.func(prices, dp)
+        # Loop backwards through days
+        for price in reversed(prices):
+            # We loop backwards through states (from 3 down to 0) so we don't 
+            # overwrite values from 'tomorrow' that are needed for 'today'
+            
+            # State 3: Second Sell (Odd state -> Sell)
+            dp[3] = max(price + 0, dp[3]) # selling gives cash, transaction ends (profit 0 after)
+            
+            # State 2: Second Buy (Even state -> Buy)
+            dp[2] = max(-price + dp[3], dp[2]) # buying costs cash, transitions to State 3
+            
+            # State 1: First Sell (Odd state -> Sell)
+            dp[1] = max(price + dp[2], dp[1]) # selling gives cash, transitions to State 2
+            
+            # State 0: First Buy (Even state -> Buy)
+            dp[0] = max(-price + dp[1], dp[0]) # buying costs cash, transitions to State 1
+            
+        # Ultimately, we want the max profit starting from the very first action (First Buy)
+        return dp[0]
