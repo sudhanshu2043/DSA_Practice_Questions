@@ -1,35 +1,30 @@
 from typing import List
 
 class Solution:
-    def func(self, prices, dp, ind, buy, cap):
-        # Base Case 1: Out of days
-        if ind == len(prices): 
-            return 0
-        # Base Case 2: No transactions left allowed
-        if cap == 0: 
-            return 0
-            
-        # Check if we already calculated this state
-        if dp[ind][buy][cap] != -1: 
-            return dp[ind][buy][cap]
+    def func(self, prices, dp):
+        n = len(prices)
         
-        if buy:
-            # Option 1: Buy today -> cap stays same, next state cannot buy (0)
-            # Option 2: Skip today -> cap stays same, next state can buy (1)
-            dp[ind][buy][cap] = max(-prices[ind] + self.func(prices, dp, ind + 1, 0, cap),
-                                    self.func(prices, dp, ind + 1, 1, cap))
-        else:
-            # Option 1: Sell today -> cap decreases by 1, next state can buy (1)
-            # Option 2: Skip today -> cap stays same, next state cannot buy (0)
-            dp[ind][buy][cap] = max(prices[ind] + self.func(prices, dp, ind + 1, 1, cap - 1),
-                                    self.func(prices, dp, ind + 1, 0, cap))
+        # Loop backwards from day n-1 down to 0
+        for ind in range(n - 1, -1, -1):
+            for buy in range(2):
+                # FIX 1: Start from 1 to avoid cap-1 becoming -1
+                for cap in range(1, 3): 
+                    if buy:
+                        dp[ind][buy][cap] = max(-prices[ind] + dp[ind + 1][0][cap], 
+                                                 dp[ind + 1][1][cap])
+                    else:
+                        dp[ind][buy][cap] = max(prices[ind] + dp[ind + 1][1][cap - 1], 
+                                                 dp[ind + 1][0][cap])
                                     
-        return dp[ind][buy][cap]
+        # FIX 3: Return the specific starting state: Day 0, Can Buy, 2 Transactions left
+        return dp[0][1][2]
 
     def maxProfit(self, prices: List[int]) -> int:
         n = len(prices)
-        # Dimensions: [ind from 0 to n][buy from 0 to 1][cap from 0 to 2]
-        # Size: (n + 1) x 2 x 3
-        dp = [[[-1] * 3 for _ in range(2)] for _ in range(n + 1)]
-        # Start on Day 0, allowed to buy (1), with 2 transactions left
-        return self.func(prices, dp, 0, 1, 2)
+        
+        # FIX 2: Initialize with 0 instead of -1. 
+        # This automatically sets up the base cases for ind == n and cap == 0.
+        dp = [[[0] * 3 for _ in range(2)] for _ in range(n + 1)]
+        
+        # No need to pass starting values as parameters anymore
+        return self.func(prices, dp)
