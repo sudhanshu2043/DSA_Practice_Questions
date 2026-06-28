@@ -1,32 +1,33 @@
 class Solution:
-    def func(self, i, j, cuts, dp):
-        if i > j: 
-            return 0
-        
-        if dp[i][j] != -1:
-            return dp[i][j]
-            
-        mini = 1e9
-        # The cost to cut the current stick segment
-        current_stick_length = cuts[j + 1] - cuts[i - 1]
-        
-        for ind in range(i, j + 1): # j is inclusive
-            cost = current_stick_length + self.func(i, ind - 1, cuts, dp) + self.func(ind + 1, j, cuts, dp)
-            mini = min(cost, mini)
-            
-        dp[i][j] = mini
-        return dp[i][j]
-
     def minCost(self, n: int, cuts: list[int]) -> int:
-        # 1. MUST SORT the cuts first
+        # 1. Sort the cuts so independent subproblems can be formed
         cuts.sort()
         
-        # 2. Pad with 0 and n to easily grab stick lengths
+        # 2. Append 0 and n to represent the boundaries of the stick
         cuts = [0] + cuts + [n]
-        c = len(cuts)
+        m = len(cuts)
         
-        # dp array size based on padded cuts length
-        dp = [[-1] * c for _ in range(c)]
+        # 3. Create a 2D DP array initialized to 0
+        # Base cases where i > j are implicitly handled as 0
+        dp = [[0] * m for _ in range(m)]
         
-        # i starts at 1, j ends at len(cuts) - 2 (the last actual cut index)
-        return self.func(1, len(cuts) - 2, cuts, dp)
+        # 4. Nested loops to solve from smallest subproblems to largest
+        # i moves backwards (from the last actual cut down to 1)
+        for i in range(m - 2, 0, -1):
+            # j moves forward (from i up to the last actual cut)
+            for j in range(i, m - 1):
+                
+                mini = float('inf')
+                # The length of the current stick we are cutting
+                current_stick_length = cuts[j + 1] - cuts[i - 1]
+                
+                # Try making a cut at every available independent index 'ind'
+                for ind in range(i, j + 1):
+                    cost = current_stick_length + dp[i][ind - 1] + dp[ind + 1][j]
+                    if cost < mini:
+                        mini = cost
+                        
+                dp[i][j] = mini
+                
+        # The answer for the entire stick spanning from cut index 1 to m-2
+        return dp[1][m - 2]
